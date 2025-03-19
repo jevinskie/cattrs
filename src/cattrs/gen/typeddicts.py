@@ -361,12 +361,12 @@ def make_dict_structure_fn(
             if not attr_required:
                 lines.append(f"{i}if '{kn}' in o:")
                 i = f"{i}  "
+            lines.append(f"{i}print(f'cl_name: {cl_name} res: {{res}} o: {{o}}', flush=True)")
             lines.append(f"{i}try:")
             i = f"{i}  "
 
             tn = f"__c_type_{ix}"
             internal_arg_parts[tn] = t
-
             if handler == converter._structure_call:
                 internal_arg_parts[struct_handler_name] = t
                 lines.append(f"{i}res['{an}'] = {struct_handler_name}(o['{kn}'])")

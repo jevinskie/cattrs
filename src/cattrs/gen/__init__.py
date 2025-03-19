@@ -403,6 +403,7 @@ def make_dict_structure_fn_from_attrs(
             i = "  "
 
             if not a.init:
+                pi_lines.append(f"{i}print(f'pi cl_name: {cl_name} res: {{res}} o: {{o}}', flush=True)")
                 if a.default is not NOTHING:
                     pi_lines.append(f"{i}if '{kn}' in o:")
                     i = f"{i}  "
@@ -433,6 +434,7 @@ def make_dict_structure_fn_from_attrs(
                 pi_lines.append(f"{i}errors.append(e)")
 
             else:
+                lines.append(f"{i}print(f'cl_name: {cl_name} res: {{res}} o: {{o}}', flush=True)")
                 if a.default is not NOTHING:
                     lines.append(f"{i}if '{kn}' in o:")
                     i = f"{i}  "
