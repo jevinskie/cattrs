@@ -34,6 +34,7 @@ from ._consts import AttributeOverride, already_generating, neutral
 from ._generics import generate_mapping
 from ._lc import generate_unique_filename
 from ._shared import find_structure_handler
+from ..fns import compilez as compile
 
 if TYPE_CHECKING:
     from ..converters import BaseConverter
@@ -435,6 +436,7 @@ def make_dict_structure_fn_from_attrs(
 
             else:
                 lines.append(f"{i}print(f'cl_name: {cl_name} res: {{res}} o: {{o}}', flush=True)")
+                lines.append(f"{i}print(f'cl_name: {cl_name} type(o): {{type(o)}} type(res): {{type(res)}}', flush=True)")
                 if a.default is not NOTHING:
                     lines.append(f"{i}if '{kn}' in o:")
                     i = f"{i}  "

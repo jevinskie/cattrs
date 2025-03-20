@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING, Any, Callable, Literal, TypeVar
 from attrs import NOTHING, Attribute
 from typing_extensions import _TypedDictMeta
 
+from ..fns import compilez as compile
+
 try:
     from inspect import get_annotations
 

@@ -1,5 +1,6 @@
 """Useful internal functions."""
 
+from types import CodeType
 from typing import Any, Callable, NoReturn, TypeVar
 
 from ._compat import TypeAlias
@@ -20,3 +21,45 @@ def raise_error(_, cl: Any) -> NoReturn:
     """At the bottom of the condition stack, we explode if we can't handle it."""
     msg = f"Unsupported type: {cl!r}. Register a structure hook for it."
     raise StructureHandlerNotFoundError(msg, type_=cl)
+
+
+import hashlib
+import astroid
+
+_seen_code = set()
+_seen_func_names: set[str] = set()
+_seen_digests: dict[str, bytes] = dict()
+
+def evalz(source: Any,
+        globals: dict[str, Any] | None = None,
+        locals: dict[str, object] | None = None) -> Any:
+    eval(source, globals, locals)
+
+def compilez(source: str, filename: str, mode: str) -> CodeType:
+    if mode != "exec":
+        raise NotImplementedError(f"mode '{mode}' != exec")
+    h = hashlib.sha1(source.encode(), usedforsecurity=False)
+    digest = h.digest()
+    d = digest.hex()
+    # print(f"filename: {filename} str: {str(filename)}")
+    # print(f"src: {source}")
+    open(f"/tmp/cattrs/hashed/cattrs_dbg_{d}.py", "w").write(source)
+    mod = astroid.parse(source)
+    func = mod.body[0]
+    if not isinstance(func, astroid.FunctionDef):
+        raise TypeError(f"Expection FunctionDef for '{filename}' in:\n{source}")
+    # filename = <cattrs generated structure instdec.util.Trits>
+    pfile = filename[1:-1]
+    pfile = pfile.replace(" ", "_")
+    pfile = pfile.replace(".", "_")
+    fname = func.name
+    key = f"{pfile}-KVP-{fname}"
+    if pfile in _seen_func_names:
+        if digest != _seen_digests[key]:
+            emsg = f"func name: '{fname}' from filename '{filename}' sha1: {d} pfile: '{pfile}' is already seen. Seen: {_seen_func_names}\nsource:\n{source}"
+            # print(emsg)
+            raise ValueError(emsg)
+    _seen_func_names.add(pfile)
+    _seen_digests[key] = digest
+    open(f"/tmp/cattrs/named/{pfile}.py", "w").write(source)
+    return compile(source, filename, mode)
