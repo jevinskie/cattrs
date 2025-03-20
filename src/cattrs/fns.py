@@ -55,11 +55,13 @@ def compilez(source: str, filename: str, mode: str) -> CodeType:
     fname = func.name
     key = f"{pfile}-KVP-{fname}"
     if pfile in _seen_func_names:
-        if digest != _seen_digests[key]:
-            emsg = f"func name: '{fname}' from filename '{filename}' sha1: {d} pfile: '{pfile}' is already seen. Seen: {_seen_func_names}\nsource:\n{source}"
-            # print(emsg)
-            raise ValueError(emsg)
+        if key in _seen_digests and digest != _seen_digests[key]:
+            emsg = f"func name: '{fname}' from filename '{filename}' sha1: {d} pfile: '{pfile}' is already seen. DIDSEEN: {_seen_func_names}\nsource:\n{source}"
+            print(emsg)
+        elif key not in _seen_digests:
+            emsg = f"func name: '{fname}' from filename '{filename}' sha1: {d} pfile: '{pfile}' is already seen. NOTSEEN: {_seen_func_names}\nsource:\n{source}"
+            print(emsg)
     _seen_func_names.add(pfile)
     _seen_digests[key] = digest
-    open(f"/tmp/cattrs/named/{pfile}.py", "w").write(source)
+    open(f"/tmp/cattrs/named/fname_{fname}_pfile_{pfile}_hash_{d}.py", "w").write(source)
     return compile(source, filename, mode)
