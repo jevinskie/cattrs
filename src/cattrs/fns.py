@@ -25,15 +25,23 @@ def raise_error(_, cl: Any) -> NoReturn:
 
 import hashlib
 import astroid
+import sys
+import pdb
+import IPython
 
 _seen_code = set()
 _seen_func_names: set[str] = set()
 _seen_digests: dict[str, bytes] = dict()
 
+
+class JevException(Exception): pass
+
+
 def evalz(source: Any,
         globals: dict[str, Any] | None = None,
         locals: dict[str, object] | None = None) -> Any:
     eval(source, globals, locals)
+
 
 def compilez(source: str, filename: str, mode: str) -> CodeType:
     if mode != "exec":
@@ -53,14 +61,21 @@ def compilez(source: str, filename: str, mode: str) -> CodeType:
     pfile = pfile.replace(" ", "_")
     pfile = pfile.replace(".", "_")
     fname = func.name
+    print(f"filename: {filename}", flush=True)
+    if filename == "":
+        # pdb.set_trace()
+        # IPython.embed()
+        raise JevException(f"no filename fname: '{fname}' source: {source}")
     key = f"{pfile}-KVP-{fname}"
     if pfile in _seen_func_names:
         if key in _seen_digests and digest != _seen_digests[key]:
             emsg = f"func name: '{fname}' from filename '{filename}' sha1: {d} pfile: '{pfile}' is already seen. DIDSEEN: {_seen_func_names}\nsource:\n{source}"
-            print(emsg)
+            # print(emsg)
+            raise ValueError(emsg)
         elif key not in _seen_digests:
             emsg = f"func name: '{fname}' from filename '{filename}' sha1: {d} pfile: '{pfile}' is already seen. NOTSEEN: {_seen_func_names}\nsource:\n{source}"
-            print(emsg)
+            # print(emsg)
+            raise ValueError(emsg)
     _seen_func_names.add(pfile)
     _seen_digests[key] = digest
     open(f"/tmp/cattrs/named/fname_{fname}_pfile_{pfile}_hash_{d}.py", "w").write(source)
