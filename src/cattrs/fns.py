@@ -65,17 +65,18 @@ def compilez(source: str, filename: str, mode: str) -> CodeType:
     if filename == "":
         # pdb.set_trace()
         # IPython.embed()
-        raise JevException(f"no filename fname: '{fname}' source: {source}")
+        # raise JevException(f"no filename fname: '{fname}' source: {source}")
+        pass
     key = f"{pfile}-KVP-{fname}"
     if pfile in _seen_func_names:
         if key in _seen_digests and digest != _seen_digests[key]:
             emsg = f"func name: '{fname}' from filename '{filename}' sha1: {d} pfile: '{pfile}' is already seen. DIDSEEN: {_seen_func_names}\nsource:\n{source}"
-            # print(emsg)
-            raise ValueError(emsg)
+            print(emsg)
+            # raise JevException(emsg)
         elif key not in _seen_digests:
             emsg = f"func name: '{fname}' from filename '{filename}' sha1: {d} pfile: '{pfile}' is already seen. NOTSEEN: {_seen_func_names}\nsource:\n{source}"
-            # print(emsg)
-            raise ValueError(emsg)
+            print(emsg)
+            # raise JevException(emsg)
     _seen_func_names.add(pfile)
     _seen_digests[key] = digest
     open(f"/tmp/cattrs/named/fname_{fname}_pfile_{pfile}_hash_{d}.py", "w").write(source)

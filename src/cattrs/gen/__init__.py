@@ -404,7 +404,7 @@ def make_dict_structure_fn_from_attrs(
             i = "  "
 
             if not a.init:
-                pi_lines.append(f"{i}print(f'pi cl_name: {cl_name} res: {{res}} o: {{o}}', flush=True)")
+                # pi_lines.append(f"{i}print(f'pi cl_name: {cl_name} res: {{res}} o: {{o}}', flush=True)")
                 if a.default is not NOTHING:
                     pi_lines.append(f"{i}if '{kn}' in o:")
                     i = f"{i}  "
@@ -435,8 +435,8 @@ def make_dict_structure_fn_from_attrs(
                 pi_lines.append(f"{i}errors.append(e)")
 
             else:
-                lines.append(f"{i}print(f'cl_name: {cl_name} res: {{res}} o: {{o}}', flush=True)")
-                lines.append(f"{i}print(f'cl_name: {cl_name} type(o): {{type(o)}} type(res): {{type(res)}}', flush=True)")
+                # lines.append(f"{i}print(f'cl_name: {cl_name} res: {{res}} o: {{o}}', flush=True)")
+                # lines.append(f"{i}print(f'cl_name: {cl_name} type(o): {{type(o)}} type(res): {{type(res)}}', flush=True)")
                 if a.default is not NOTHING:
                     lines.append(f"{i}if '{kn}' in o:")
                     i = f"{i}  "
@@ -459,6 +459,20 @@ def make_dict_structure_fn_from_attrs(
                 i = i[:-2]
                 lines.append(f"{i}except Exception as e:")
                 i = f"{i}  "
+                lines.append(f"{i}o2 = o.copy()")
+                lines.append(f"{i}if 'children' in o2:")
+                lines.append(f"{i}    del o2['children']")
+                lines.append(f"{i}if 'encoding' in o2:")
+                lines.append(f"{i}    del o2['encoding']")
+                lines.append(f"{i}if 'condition' in o2:")
+                lines.append(f"{i}    del o2['condition']")
+                lines.append(f"{i}if 'assembly_rules' in o2:")
+                lines.append(f"{i}    del o2['assembly_rules']")
+                lines.append(f"{i}if 'instructions' in o2:")
+                lines.append(f"{i}    del o2['instructions']")
+                lines.append(f"{i}if 'operations' in o2:")
+                lines.append(f"{i}    del o2['operations']")
+                lines.append(f"{i}print(f'o2: {{o2}}')")
                 lines.append(
                     f'{i}e.__notes__ = getattr(e, \'__notes__\', []) + [__c_avn("Structuring class {cl.__qualname__} @ attribute {an}", "{an}", __c_type_{an})]'
                 )
